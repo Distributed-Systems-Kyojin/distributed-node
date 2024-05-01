@@ -1,32 +1,31 @@
 # node-backend-framework
 
-# Instructions
+## Instructions
 
 1. Add the ".env" file with the neccessary connection strings and secret keys to the project directory
 
 2. Run below command from the project directory to update the server dependencies to their latest versions
+
 ### `npm run update_dep`
 
 3. Run below commands one by one from the project directory to install the packages
+
 ### `npm install`
+
 ### `npm run install-client`
 
-## App deployment options (all commands should run from the project directory)
+## Server deployment options (all commands should run from the project directory)
 
-1. To run the "front-end" alone
+### 1. To run the "front-end" alone
+
 ### `npm run client`
 
-2. To run the "back-end" alone
+### 2. To run a server instance with default configuration
+
 ### `npm run server`
 
-### 2. To run the full application
-### `npm run dev`
+### 3. To run a server instance with a specific node ID and a port
 
-### 3. To run tests
-### `npm test`
+### `set NODE_ID=<An integet> && set PORT=<Port Number (defauld 5000)> && npm run server`
 
-### 4. To run a specific test file
-### `npm test -- bar.test.js`
-
-### 5. To re-generate the test coverage
-### `npm test -- --coverage`
+This will launch a server instance with the specified port and an sqlite database instance will be created based on the given NODE_ID (if not existing).
