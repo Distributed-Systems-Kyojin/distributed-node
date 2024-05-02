@@ -4,7 +4,7 @@ const cors = require('cors');
 // environmental variables
 require('dotenv').config();
 
-const testRoutes = require('./routes/testRoutes');
+const fileRoutes = require('./routes/fileRoutes');
 
 const makeApp = () => {
     // express app
@@ -42,7 +42,7 @@ const makeApp = () => {
     });
 
     //routes
-    app.use('/test', testRoutes);
+    app.use('/file', fileRoutes);
 
     return app;
 }
