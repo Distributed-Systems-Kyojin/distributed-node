@@ -1,6 +1,7 @@
+const utils = require('./utils/helper');
+
 // environmental variables
 require('dotenv').config();
-const dbURI = process.env.DB_URI;
 
 //express app
 const appMaker = require('./app');
@@ -13,7 +14,38 @@ db_conn.initDatabase(db);
 
 const port = process.env.PORT || 5000;
 
-// connect to mongodb and listen
 app.listen(port, () => {
     console.log(`Running on port ${port}`);
 });
+
+utils.registerNode();
+
+// Handle process exit to unregister the node
+const handleExit = async () => {
+
+    // utils.unregisterNode().then(() => {
+    //     process.exit();
+    // })
+    // .catch((err) => {
+
+    //     console.error('Error during deregistration:', err);
+    //     process.exit(1);
+    // });
+
+    try {
+        
+        await utils.unregisterNode();
+        process.exit();
+    } 
+    catch (error) {
+
+        console.error('Error during deregistration:', err);
+        process.exit(1);
+    }
+};
+
+// Listen for various termination signals
+process.on('exit', handleExit);
+process.on('SIGINT', handleExit); // For CTRL+C
+process.on('SIGTERM', handleExit); // For external kill commands
+process.on('SIGHUP', handleExit); // When the terminal is closed
