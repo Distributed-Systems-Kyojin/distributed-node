@@ -24,7 +24,7 @@ const initDatabase = (db) => {
 
     db.serialize(() => {
 
-        db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='users'", [], (err, row) => {
+        db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='ChunkData'", [], (err, row) => {
 
             if (err) {
                 console.error('Error checking for table', err);
@@ -34,20 +34,21 @@ const initDatabase = (db) => {
 
                 // Table doesn't exist, create it
                 db.run(
-                    'CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT)',
+                    'CREATE TABLE ChunkData (chunkID TEXT PRIMARY KEY, fileName TEXT, merkleRootHash TEXT, nextChunkNodeID TEXT, nextChunkNodeURL TEXT, chunkPath TEXT, chunkIndex INTEGER, createdAt TEXT)',
                     (err) => {
                         if (err) {
-                            console.error('Could not create users table', err);
+                            console.error('Could not create ChunkData table', err);
                         } 
                         else {
-                            console.log('Created users table');
+                            console.log('Created ChunkData table');
                         }
                     }
                 );
+
                 return;
             } 
             else {
-                console.log('Users table already exists');
+                console.log('Table already exists');
                 return row;
             }
         });
