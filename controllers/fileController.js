@@ -1,47 +1,34 @@
 require("dotenv").config();
 
-const db_conn = require('../db_connection');
-const db = db_conn.openDatabase();
+const { json } = require("express");
 
-//register a personal client
-const test_get = async (req, res) => {
+const fileService = require('../services/fileService');
+
+const saveChunk = async (req, res) => {
+    const { chunkId, fileName, chunkIndex, chunk } = req.body;
+    let base64Data = Buffer.from(chunk).toString('base64');
 
     try {
-
-        const { name, email } = { name: "test", email: "example@gmail.com" };
-        db.run('INSERT INTO users (name, email) VALUES (?, ?)', [name, email], function (err) {
-
-            if (err) {
-                return res.status(500).json({ error: err.message });
-            }
-            
-            console.log("A row has been inserted with rowid " + this.lastID);
-        });
-
-        db.all('SELECT * FROM users', [], (err, rows) => {
-
-            if (err) {
-                return res.status(500).json({ error: err.message });
-            }
-
-            res.json({
-                status: "ok",
-                data: rows
-            });
-        });
-    }
-    catch (err) {
-
+        await fileService.saveChunk(chunkId, fileName, chunkIndex, base64Data);
+        res.status(200).send(json({ message: `Chunk ${chunkIndex} saved for ${fileName}` }));
+    } catch (err) {
         console.log(err);
-
-        res.status(400).json({
-            status: "error",
-        });
+        res.status(500).send(json({ message: `Error saving chunk ${chunkIndex} for ${fileName}` }));
     }
-};
+}
 
-
+const getChunk = async (req, res) => {
+    const { chunkId, fileName } = req.params;
+    try {
+        const chunkData = await fileService.getChunk(chunkId, fileName);
+        res.status(200).send(chunkData);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(json({ message: `Error getting chunk for ${fileName}` }));
+    }
+}
 
 module.exports = {
-    test_get,
+    saveChunk,
+    getChunk
 };
