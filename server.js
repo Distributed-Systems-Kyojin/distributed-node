@@ -10,7 +10,7 @@ const app = appMaker.makeApp();
 // db connection methods
 const db_conn = require('./db_connection');
 const db = db_conn.openDatabase();
-db_conn.initDatabase(db);
+db_conn.initDatabase();
 
 const port = process.env.PORT || 5000;
 
