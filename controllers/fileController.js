@@ -10,10 +10,10 @@ const saveChunk = async (req, res) => {
 
     try {
         await fileService.saveChunk(chunkId, fileName, chunkIndex, base64Data);
-        res.status(200).send(json({ message: `Chunk ${chunkIndex} saved for ${fileName}` }));
+        res.status(200).send({ message: `Chunk ${chunkIndex} saved for ${fileName}` });
     } catch (err) {
         console.log(err);
-        res.status(500).send(json({ message: `Error saving chunk ${chunkIndex} for ${fileName}` }));
+        res.status(500).send({ message: `Error saving chunk ${chunkIndex} for ${fileName}` });
     }
 }
 
@@ -24,7 +24,7 @@ const getChunk = async (req, res) => {
         res.status(200).send(chunkData);
     } catch (err) {
         console.log(err);
-        res.status(500).send(json({ message: `Error getting chunk for ${fileName}` }));
+        res.status(500).send({ message: `Error getting chunk for ${fileName}` });
     }
 }
 
