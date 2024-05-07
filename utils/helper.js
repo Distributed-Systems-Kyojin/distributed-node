@@ -4,7 +4,8 @@ require('dotenv').config();
 const fileServerUrl = 'http://localhost:3000';
 
 const nodeId = process.env.NODE_ID;
-const nodeURL = `http://localhost:${process.env.PORT || 5000}`;
+const port = process.env.PORT ? process.env.PORT.trim() : '5000';
+const nodeURL = `http://localhost:${port}`;
 
 // Register with the file server
 const registerNode = async () => {
