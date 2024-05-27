@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "update_dep": "npm i -g npm-check-updates && ncu -u && npm install"
+    "update_dep": "npm i -g npm-check-updates && ncu -u && npm install",
+    "dev": "set NODE_ID=2 && set PORT=8080 && npm run server"
   },
   "repository": {
     "type": "git",

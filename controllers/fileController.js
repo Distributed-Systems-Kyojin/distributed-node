@@ -5,6 +5,7 @@ const { json } = require("express");
 const fileService = require('../services/fileService');
 
 const saveChunk = async (req, res) => {
+    console.log("inside saveChunk");
     const { chunkId, fileName, chunkIndex, chunk } = req.body;
     let base64Data = Buffer.from(chunk).toString('base64');
 
