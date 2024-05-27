@@ -5,7 +5,6 @@ const { json } = require("express");
 const fileService = require('../services/fileService');
 
 const saveChunk = async (req, res) => {
-    console.log("inside saveChunk");
     const { chunkId, fileName, chunkIndex, chunk } = req.body;
     let base64Data = Buffer.from(chunk).toString('base64');
 
@@ -19,9 +18,9 @@ const saveChunk = async (req, res) => {
 }
 
 const getChunk = async (req, res) => {
-    const { chunkId, fileName } = req.params;
+    const { fileName, chunkIndex } = req.query;
     try {
-        const chunkData = await fileService.getChunk(chunkId, fileName);
+        const chunkData = await fileService.getChunk(fileName, chunkIndex);
         res.status(200).send(chunkData);
     } catch (err) {
         console.log(err);
