@@ -17,10 +17,11 @@ const saveChunk = async (chunkId, fileName, chunkIndex, chunkData) => {
     });
 }
 
-// get saved chunk data from id and filename
-const getChunk = async (chunkId, fileName) => {
-    const selectQuery = 'SELECT * FROM ChunkData WHERE chunkID = ? AND fileName = ?';
-    const params = [chunkId, fileName];
+// get saved chunk data from filename and chunk index
+const getChunk = async (fileName, chunkIndex) => {
+    const selectQuery = 'SELECT * FROM ChunkData WHERE chunkIndex = ? AND fileName = ?';
+    const params = [chunkIndex, fileName];
+    console.log(`Retrieving chunk data for ${fileName} with index ${chunkIndex}`);
     return new Promise((resolve, reject) => {
         db.get(selectQuery, params, (err, row) => {
             if (err) {
@@ -28,7 +29,7 @@ const getChunk = async (chunkId, fileName) => {
                 reject(err);
             }
             else {
-                console.log(`Retrieved chunk data for ${fileName} with id ${chunkId}`);
+                console.log(`Retrieved chunk data for ${fileName} with index ${chunkIndex}`);
                 resolve(row);
             }
         });
