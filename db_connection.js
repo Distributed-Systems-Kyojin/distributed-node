@@ -30,7 +30,7 @@ const initDatabase = () => {
             else if (!row) {
                 // Table doesn't exist, create it
                 db.run(
-                    'CREATE TABLE ChunkData (chunkID TEXT PRIMARY KEY, fileName TEXT, chunkIndex INTEGER, chunkData TEXT, createdAt TEXT)',
+                    'CREATE TABLE ChunkData (chunkID TEXT PRIMARY KEY, fileId TEXT, fileName TEXT, chunkIndex INTEGER, chunkData TEXT, createdAt TEXT)',
                     (err) => {
                         if (err) {
                             console.error('Could not create ChunkData table', err);
