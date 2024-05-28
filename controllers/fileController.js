@@ -21,6 +21,9 @@ const getChunk = async (req, res) => {
     const { fileName, chunkIndex } = req.query;
     try {
         const chunkData = await fileService.getChunk(fileName, chunkIndex);
+        const decodedChunk = Buffer.from(chunkData.chunkData, 'base64');
+        chunkData.chunkData = decodedChunk;
+        
         res.status(200).send(chunkData);
     } catch (err) {
         console.log(err);

@@ -21,7 +21,7 @@ const saveChunk = async (chunkId, fileName, chunkIndex, chunkData) => {
 const getChunk = async (fileName, chunkIndex) => {
     const selectQuery = 'SELECT * FROM ChunkData WHERE chunkIndex = ? AND fileName = ?';
     const params = [chunkIndex, fileName];
-    console.log(`Retrieving chunk data for ${fileName} with index ${chunkIndex}`);
+    
     return new Promise((resolve, reject) => {
         db.get(selectQuery, params, (err, row) => {
             if (err) {
