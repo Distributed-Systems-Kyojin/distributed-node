@@ -1,9 +1,9 @@
 const db = require('../db_connection').openDatabase();
 
 // save chunk data to the database
-const saveChunk = async (chunkId, fileName, chunkIndex, chunkData) => {
-    const insertQuery = 'INSERT INTO ChunkData (chunkID, fileName, chunkIndex, chunkData, createdAt) VALUES (?, ?, ?, ?, ?)';
-    const params = [chunkId, fileName, chunkIndex, chunkData, new Date().toISOString()];
+const saveChunk = async (chunkId, fileId, fileName, chunkIndex, chunkData) => {
+    const insertQuery = 'INSERT INTO ChunkData (chunkID, fileId, fileName, chunkIndex, chunkData, createdAt) VALUES (?, ?, ?, ?, ?, ?)';
+    const params = [chunkId, fileId, fileName, chunkIndex, chunkData, new Date().toISOString()];
     return new Promise((resolve, reject) => {
         db.run(insertQuery, params, function(err) {
             if (err) {
@@ -18,9 +18,9 @@ const saveChunk = async (chunkId, fileName, chunkIndex, chunkData) => {
 }
 
 // get saved chunk data from filename and chunk index
-const getChunk = async (fileName) => {
-    const selectQuery = 'SELECT * FROM ChunkData WHERE fileName = ?';
-    const params = [fileName];
+const getChunk = async (fileId) => {
+    const selectQuery = 'SELECT * FROM ChunkData WHERE fileId = ?';
+    const params = [fileId];
     
     return new Promise((resolve, reject) => {
 
@@ -30,7 +30,7 @@ const getChunk = async (fileName) => {
                 reject(err);
             }
             else {
-                console.log(`Retrieved chunk data for ${fileName}`);
+                console.log(`Retrieved chunk data for ${fileId}`);
                 resolve(row);
             }
         });
