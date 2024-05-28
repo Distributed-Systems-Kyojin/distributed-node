@@ -18,13 +18,15 @@ const saveChunk = async (req, res) => {
 }
 
 const getChunk = async (req, res) => {
-    const { fileName, chunkIndex } = req.query;
+    const { fileName } = req.query;
     try {
-        const chunkData = await fileService.getChunk(fileName, chunkIndex);
-        const decodedChunk = Buffer.from(chunkData.chunkData, 'base64');
-        chunkData.chunkData = decodedChunk;
+        const chunkDataList = await fileService.getChunk(fileName);
         
-        res.status(200).send(chunkData);
+        chunkDataList.map((chunkDataItem) => {
+            chunkDataItem.chunkData = Buffer.from(chunkDataItem.chunkData, 'base64');
+        });
+        
+        res.status(200).send(chunkDataList);
     } catch (err) {
         console.log(err);
         res.status(500).send({ message: `Error getting chunk for ${fileName}` });

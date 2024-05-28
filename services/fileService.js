@@ -18,18 +18,19 @@ const saveChunk = async (chunkId, fileName, chunkIndex, chunkData) => {
 }
 
 // get saved chunk data from filename and chunk index
-const getChunk = async (fileName, chunkIndex) => {
-    const selectQuery = 'SELECT * FROM ChunkData WHERE chunkIndex = ? AND fileName = ?';
-    const params = [chunkIndex, fileName];
+const getChunk = async (fileName) => {
+    const selectQuery = 'SELECT * FROM ChunkData WHERE fileName = ?';
+    const params = [fileName];
     
     return new Promise((resolve, reject) => {
-        db.get(selectQuery, params, (err, row) => {
+
+        db.all(selectQuery, params, (err, row) => {
             if (err) {
                 console.error('Error getting chunk data:', err);
                 reject(err);
             }
             else {
-                console.log(`Retrieved chunk data for ${fileName} with index ${chunkIndex}`);
+                console.log(`Retrieved chunk data for ${fileName}`);
                 resolve(row);
             }
         });
