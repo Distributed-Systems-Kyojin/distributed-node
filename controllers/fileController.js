@@ -9,7 +9,7 @@ const saveChunk = async (req, res) => {
     let base64Data = Buffer.from(chunk).toString('base64');
 
     try {
-        await fileService.saveChunk(chunkId, fileId, fileName, chunkIndex, base64Data);
+        await fileService.saveChunkAsFile(chunkId, fileId, fileName, chunkIndex, base64Data);
         res.status(200).send({ message: `Chunk ${chunkIndex} saved for ${fileName}` });
     } catch (err) {
         console.log(err);
@@ -20,7 +20,7 @@ const saveChunk = async (req, res) => {
 const getChunk = async (req, res) => {
     const { fileId } = req.query;
     try {
-        const chunkDataList = await fileService.getChunk(fileId);
+        const chunkDataList = await fileService.getChunkFromFile(fileId);
         
         chunkDataList.map((chunkDataItem) => {
             chunkDataItem.chunkData = Buffer.from(chunkDataItem.chunkData, 'base64');
