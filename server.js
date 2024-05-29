@@ -8,11 +8,6 @@ const appMaker = require('./app');
 const app = appMaker.makeApp();
 
 // db connection methods
-
-// const db_conn = require('./db_connection');
-// const db = db_conn.openDatabase();
-// db_conn.initDatabase();
-
 const db_conn = require('./db_connection_pg');
 const connect_db = async (db_conn) => {
     await db_conn.createDB();
@@ -25,7 +20,7 @@ app.listen(port, () => {
     console.log(`Running on port ${port}`);
 });
 
-// utils.registerNode();
+utils.registerNode();
 
 // Handle process exit to unregister the node
 const handleExit = async () => {
