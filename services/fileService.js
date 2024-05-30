@@ -1,99 +1,125 @@
 const fs = require('fs');
 const path = require('path');
-const db = require('../db_connection').openDatabase();
 
-// save chunk data to the database
+const db = require('../db_connection_pg');
+
+var pool = null;
+const getPool = async () => {
+
+    if (pool === null) {
+        pool = await db.getDB();
+    }
+}
+getPool();
+
 const saveChunk = async (chunkId, fileId, fileName, chunkIndex, chunkData) => {
-    const insertQuery = 'INSERT INTO ChunkData (chunkID, fileId, fileName, chunkIndex, chunkData, createdAt) VALUES (?, ?, ?, ?, ?, ?)';
-    const params = [chunkId, fileId, fileName, chunkIndex, chunkData, new Date().toISOString()];
-    return new Promise((resolve, reject) => {
-        db.run(insertQuery, params, function(err) {
-            if (err) {
-                console.error(`Error saving chunk data: ${err}`);
-                return reject(err);
-            }
 
-            console.log(`Saved chunk ${chunkIndex} for ${fileName}`);
-            resolve();
-        });
-    });
+    const insertQuery = {
+        name: 'save-chunk',
+        text: 'INSERT INTO "ChunkData" ("chunkID", "fileId", "fileName", "chunkIndex", "chunkData", "createdAt") VALUES ($1, $2, $3, $4, $5, $6)',
+        values: [chunkId, fileId, fileName, chunkIndex, chunkData, new Date().toISOString()],
+    }
+
+    try {
+        const res = await pool.query(insertQuery);
+        console.log(`Saved chunk ${chunkIndex} for ${fileName}`);
+        return
+    }
+    catch (err) {
+        console.error(`Error saving chunk data: ${err}`);
+        throw err;
+    }
 }
 
 const saveChunkAsFile = async (chunkId, fileId, fileName, chunkIndex, chunkData) => {
-    const insertQuery = 'INSERT INTO ChunkData (chunkID, fileId, fileName, chunkIndex, createdAt) VALUES (?, ?, ?, ?, ?)';
-    const params = [chunkId, fileId, fileName, chunkIndex, new Date().toISOString()];
 
-    return new Promise((resolve, reject) => {
-        db.run(insertQuery, params, function(err) {
-            if (err) {
+    const insertQuery = {
+        name: 'save-chunk-as-file',
+        text: 'INSERT INTO "ChunkData" ("chunkID", "fileId", "fileName", "chunkIndex", "createdAt") VALUES ($1, $2, $3, $4, $5)',
+        values: [chunkId, fileId, fileName, chunkIndex, new Date().toISOString()],
+    }
+
+    try {
+
+        const res = await pool.query(insertQuery);
+
+        const fileDir = path.join(__dirname, '../data', fileId);
+        const filePath = path.join(fileDir, `${chunkId}.txt`);
+
+        fs.promises.mkdir(fileDir, { recursive: true })
+            .then(() => fs.promises.writeFile(filePath, chunkData))
+            .then(() => {
+                console.log(`Saved chunk ${chunkIndex} for ${fileName}`);
+                return;
+            })
+            .catch((err) => {
                 console.error(`Error saving chunk data: ${err}`);
-                return reject(err);
-            }
-
-            const fileDir = path.join(__dirname, '../data', fileId);
-            const filePath = path.join(fileDir, `${chunkId}.txt`);
-
-            fs.promises.mkdir(fileDir, { recursive: true })
-                .then(() => fs.promises.writeFile(filePath, chunkData))
-                .then(() => {
-                    console.log(`Saved chunk ${chunkIndex} for ${fileName}`);
-                    resolve();
-                })
-                .catch((err) => {
-                    console.error(`Error saving chunk data: ${err}`);
-                    reject(err);
-                });
-        });
-    });
+                throw err;
+            });
+    }
+    catch (err) {
+        console.error(`Error saving chunk data: ${err}`);
+        throw err;
+    }
 }
 
-// get saved chunk data from filename and chunk index
 const getChunk = async (fileId) => {
-    const selectQuery = 'SELECT * FROM ChunkData WHERE fileId = ?';
-    const params = [fileId];
-    
-    return new Promise((resolve, reject) => {
 
-        db.all(selectQuery, params, (err, row) => {
-            if (err) {
-                console.error('Error getting chunk data:', err);
-                reject(err);
-            }
-            else {
-                console.log(`Retrieved chunk data for ${fileId}`);
-                resolve(row);
-            }
-        });
-    });
+    const selectQuery = {
+        name: 'get-chunk',
+        text: 'SELECT * FROM "ChunkData" WHERE "fileId" = $1',
+        values: [fileId],
+    }
+
+    try {
+
+        const res = await pool.query(selectQuery);
+        console.log(`Retrieved chunk data for ${fileId}`);
+
+        return res.rows;
+    } 
+    catch (err) {
+        console.error('Error getting chunk data:', err);
+        throw err;
+    }
 }
 
 const getChunkFromFile = async (fileId) => {
-    const selectQuery = 'SELECT * FROM ChunkData WHERE fileId = ?';
-    const params = [fileId];
 
-    return new Promise((resolve, reject) => {
-        db.all(selectQuery, params, async (err, rows) => {
-            if (err) {
-                console.error('Error getting chunk data:', err);
-                reject(err);
+    const selectQuery = {
+        name: 'get-chunk-from-file',
+        text: 'SELECT * FROM "ChunkData" WHERE "fileId" = $1',
+        values: [fileId],
+    }
+
+    try {
+
+        const res = await pool.query(selectQuery);
+        console.log(`Retrieved chunk data for ${fileId}`);
+
+        try {
+
+            const chunks = [];
+
+            for (const row of res.rows) {
+
+                const filePath = path.join(__dirname, '../data', fileId, `/${row.chunkID}.txt`);
+                const data = await fs.promises.readFile(filePath, 'utf-8');
+
+                chunks.push({ ...row, chunkData: data });
             }
-            else {
-                console.log(`Retrieved chunk data for ${fileId}`);
-                try {
-                    const chunks = [];
-                    for (const row of rows) {
-                        const filePath = path.join(__dirname, '../data', fileId, `/${row.chunkID}.txt`);
-                        const data = await fs.promises.readFile(filePath, 'utf-8');
-                        chunks.push({ ...row, chunkData: data });
-                    }
-                    resolve(chunks);
-                } catch (err) {
-                    console.error('Error getting chunk data:', err);
-                    reject(err);
-                }
-            }
-        });
-    });
+
+            return chunks;
+        } 
+        catch (err) {
+            console.error('Error getting chunk data:', err);
+            throw err;
+        }
+    } 
+    catch (err) {
+        console.error('Error getting chunk data:', err);
+        throw err;
+    }
 }
 
 module.exports = { saveChunk, getChunk, saveChunkAsFile, getChunkFromFile };
