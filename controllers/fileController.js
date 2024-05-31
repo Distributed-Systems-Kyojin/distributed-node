@@ -33,7 +33,19 @@ const getChunk = async (req, res) => {
     }
 }
 
+const deleteChunks = async (req, res) => {
+    const { fileId } = req.params;
+    try {
+        await fileService.deleteChunks(fileId);
+        res.status(200).send({ message: `Chunks deleted for ${fileId}` });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ message: `Error deleting chunks for ${fileId}` });
+    }
+}
+
 module.exports = {
     saveChunk,
-    getChunk
+    getChunk,
+    deleteChunks
 };

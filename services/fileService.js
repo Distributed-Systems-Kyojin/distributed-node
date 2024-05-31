@@ -122,4 +122,31 @@ const getChunkFromFile = async (fileId) => {
     }
 }
 
-module.exports = { saveChunk, getChunk, saveChunkAsFile, getChunkFromFile };
+const deleteChunks = async (fileId) => {
+
+    // check for the folder with fileId
+    const fileDir = path.join(__dirname, '../data/', fileId);
+    try {
+        // delete the folder
+        await fs.promises.rm(fileDir, { recursive: true });
+        console.log(`Deleted chunks for ${fileId}`);
+
+        // remove the rows from the database
+        const deleteQuery = {
+            name: 'delete-chunks',
+            text: 'DELETE FROM "ChunkData" WHERE "fileId" = $1',
+            values: [fileId],
+        }
+
+        const response = await pool.query(deleteQuery);
+        console.log(`Deleted rows for ${fileId}`);
+
+        return response;
+    } catch (error) {
+        console.error(`Error deleting chunks for ${fileId}: ${error}`);
+        throw error;
+    }
+
+}
+
+module.exports = { saveChunk, getChunk, saveChunkAsFile, getChunkFromFile, deleteChunks };

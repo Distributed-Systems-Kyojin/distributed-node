@@ -9,4 +9,7 @@ router.post('/save-chunk', fileController.saveChunk);
 // get chunks from file server
 router.get('/get-chunk', fileController.getChunk);
 
+// delete file chunks
+router.delete('/delete-chunks/:fileId', fileController.deleteChunks);
+
 module.exports = router;
