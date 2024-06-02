@@ -44,6 +44,21 @@ const makeApp = () => {
     //routes
     app.use('/file', fileRoutes);
 
+    // handle all other routes
+    app.use(async (req, res, next) => {
+        next(createError.NotFound());
+    });
+
+    app.use((err, req, res, next) => {
+        res.status(err.status || 500);
+        res.send({
+            error: {
+                status: err.status || 500,
+                message: err.message,
+            },
+        });
+    });
+
     return app;
 }
 
